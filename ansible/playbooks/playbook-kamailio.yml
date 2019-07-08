@@ -1,0 +1,7 @@
+---
+- name: installing kamailio
+  hosts: kamailio
+  gather_facts: no
+  become: yes
+  roles:
+    - kamailio

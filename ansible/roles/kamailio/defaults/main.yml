@@ -1,0 +1,11 @@
+---
+kamailio_version: 5.2.3
+
+kamailio_source_filename: "kamailio-{{ kamailio_version }}_src.tar.gz"
+kamailio_source_url: "https://www.kamailio.org/pub/kamailio/latest/src/{{ kamailio_source_filename }}"
+kamailio_source_base_directory: /usr/local/src
+kamailio_source_directory: "{{ kamailio_source_base_directory }}/kamailio-{{ kamailio_version }}"
+
+
+# kamailio-5.2.3_src.tar.gz
+# https://www.kamailio.org/pub/kamailio/latest/src/kamailio-5.2.3_src.tar.gz

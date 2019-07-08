@@ -1,0 +1,22 @@
+---
+plugin: gcp_compute
+projects:
+  - k8s-test-01-239423  
+keyd_groups:
+  - zone
+filters: []
+# cache: yes
+auth_kind: serviceaccount
+scopes:
+ - 'https://www.googleapis.com/auth/cloud-platform'
+service_account_file: /home/pchero/k8s-test-01-eadb65cfe297.json
+hostnames:
+  - name
+compose:
+  # Set an inventory parameter to use the Public IP address to connect to the host
+  # For Private ip use "networkInterfaces[0].networkIP"
+  ansible_host: networkInterfaces[0].accessConfigs[0].natIP
+groups:
+  kamailio: "'-kamailio-' in name"
+  asterisk: "'-asterisk-' in name"
+  rtpengine: "'-rtpengine-' in name"

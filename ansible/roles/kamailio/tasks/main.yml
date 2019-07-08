@@ -1,0 +1,79 @@
+---
+# - name: Create kamailio group
+
+# - name: Create Kamailio user
+
+- name: Installing useful utilities
+  apt:
+    update_cache: yes
+    pkg:
+      - tshark
+      - sngrep
+
+- name: Installing required packages
+  apt:
+    update_cache: yes
+    pkg:
+      - gcc
+      - bison
+      - flex
+      - make
+      - openssl
+      - libssl-dev
+      - python-pip
+      - python-mysqldb
+      - dbus
+      - libev4
+      - libevent-dev
+      - mysql-client
+      - libcurl4-openssl-dev
+
+- name: Install pexpect
+  pip:
+    name: pexpect
+
+- name: Remove old file
+  file: path={{ kamailio_source_base_directory }}/{{ kamailio_source_filename }} state=absent
+
+- name: Remove old directories
+  file: path={{ kamailio_source_directory }} state=absent
+
+- name: Download kamailio
+  get_url:
+    url: "{{ kamailio_source_url }}"
+    dest: "{{ kamailio_source_base_directory }}"
+
+- name: Unarchive kamailio
+  unarchive: 
+    src: "{{ kamailio_source_base_directory }}/{{ kamailio_source_filename }}"
+    dest: "{{ kamailio_source_base_directory }}"
+    copy: no
+
+- name: Build kamailio
+  command: "{{ item }}"
+  args:
+    chdir: "{{ kamailio_source_directory }}"
+  with_items:
+    - make include_module="db_mysql lcr http_async_client" cfg
+    - make all
+    - make install
+
+# - name: Add an Apt signing key, uses whichever key is at the URL
+#   apt_key:
+#     url: http://deb.kamailio.org/kamailiodebkey.gpg
+#     state: present
+
+# - name: add kamilio deb repository
+#   apt_repository:
+#     repo: deb http://deb.kamailio.org/kamailio52 stretch main
+#     state: present
+
+# - name: add kamail deb-src repository
+#   apt_repository:
+#     repo: deb-src http://deb.kamailio.org/kamailio52 stretch main
+#     state: present
+
+# - name: install kamailio
+#   apt: name={{item}} state=present update_cache=yes install_recommends=no
+#   with_items:
+#     - kamailio
