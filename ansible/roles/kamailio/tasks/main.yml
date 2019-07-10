@@ -1,7 +1,14 @@
 ---
-# - name: Create kamailio group
+- name: Create kamailio group
+  group: 
+    name: "{{ kamailio_group }}"
+    state: present
 
-# - name: Create Kamailio user
+- name: Create kamailio user
+  user:
+    name: "{{ kamailio_user }}"
+    group: "{{ kamailio_group }}"
+    state: present
 
 - name: Installing useful utilities
   apt:
@@ -58,6 +65,27 @@
     - make all
     - make install
 
+- name: Copy the startup script
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: files/systemd/kamailio.service, dest: /etc/systemd/system/kamailio.service }
+    - { src: files/tmpfiles/kamailio.conf, dest: /etc/tmpfiles.d/kamailio.conf }
+
+- name: Copy the config files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    backup: yes
+  with_items:
+    - { src: templates/kamailio.cfg.j2, dest: /usr/local/etc/kamailio/kamailio.cfg }
+    - { src: templates/dispatcher.list.j2, dest: /usr/local/etc/kamailio/dispatcher.list }
+  tags: ["kamailio_script"]
+
+# - name: Restart the kamailio
+
+  
 # - name: Add an Apt signing key, uses whichever key is at the URL
 #   apt_key:
 #     url: http://deb.kamailio.org/kamailiodebkey.gpg

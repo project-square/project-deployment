@@ -1,0 +1,20 @@
+[Unit]
+Description=Kamailio SIP Server
+Documentation=man:kamailio(8) http://www.kamailio.org/
+After=syslog.target network-online.target
+
+[Service]
+Type=forking
+User=kamailio
+Environment=SHM_SIZE=1024
+Environment=PKG_SIZE=1024
+ExecStartPre=/usr/local/sbin/kamailio -c
+ExecStart=/usr/local/sbin/kamailio -m $SHM_SIZE -M $PKG_SIZE \
+    -P /run/kamailio/kamailio.pid
+ExecStopPost=/usr/bin/rm -f /run/kamailio/kamailio.pid
+PIDFile=/run/kamailio/kamailio.pid
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

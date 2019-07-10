@@ -1,0 +1,7 @@
+---
+- name: installing asterisk
+  hosts: asterisk
+  gather_facts: no
+  become: yes
+  roles:
+    - asterisk
