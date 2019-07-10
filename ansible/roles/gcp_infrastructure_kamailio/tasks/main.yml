@@ -1,0 +1,12 @@
+---
+- name: Create instances for kamailio
+  include: create.yml gcp_instance_kamailio_name={{item}} 
+  with_items:
+    - "{{ gcp_instance_kamailio_base_name }}-01"
+    - "{{ gcp_instance_kamailio_base_name }}-02"
+  tags:
+    - create
+
+- import_tasks: delete.yml
+  tags:
+    - delete

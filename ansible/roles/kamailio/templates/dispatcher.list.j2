@@ -1,0 +1,4 @@
+
+{% for host in groups["asterisk"] %}
+1 sip:{{ hostvars[host]["networkInterfaces"][0]["networkIP"] }}:{{ kamailio_dispatcher_destination_port }}
+{% endfor %}
