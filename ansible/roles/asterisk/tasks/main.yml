@@ -5,24 +5,33 @@
 - name: Add asterisk user
   user: name={{asterisk_user}} comment='Asterisk process user' shell=/sbin/nologin group={{asterisk_group}}
 
-- name: Install asterisk dependencies
-  apt: name={{item}} state=present
+- name: Install useful utilities
+  apt:
+    state: present
     update_cache: yes
     pkg:
-        - gcc
-        - build-essential
-        - curl
-        - make
-        - python
-        - libcurl4-openssl-dev
-        - libssl-dev
-        - flex
-        - bison
-        - libncurses5-dev
-        - uuid-dev
-        - libedit-dev
-        - libxml2-dev
-        - libsqlite3-dev
+      - sip-tester
+
+
+- name: Install asterisk dependencies
+  apt:
+    state: present
+    update_cache: yes
+    pkg:
+      - gcc
+      - build-essential
+      - curl
+      - make
+      - python
+      - libcurl4-openssl-dev
+      - libssl-dev
+      - flex
+      - bison
+      - libncurses5-dev
+      - uuid-dev
+      - libedit-dev
+      - libxml2-dev
+      - libsqlite3-dev
 
 - name: Remove asterisk download file
   file: path={{asterisk_source_file}} state=absent

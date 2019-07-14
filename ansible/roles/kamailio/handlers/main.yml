@@ -1,1 +1,5 @@
 ---
+- name: restart kamailio
+  systemd:
+    name: kamailio
+    state: restarted

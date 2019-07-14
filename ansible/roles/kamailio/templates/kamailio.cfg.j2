@@ -142,6 +142,7 @@ import_file "kamailio-local.cfg"
 #!define FLB_NATSIPPING 7
 
 ####### Global Parameters #########
+#!define WITH_DEBUG
 
 ### LOG Levels: 3=DBG, 2=INFO, 1=NOTICE, 0=WARN, -1=ERR
 #!ifdef WITH_DEBUG
@@ -177,7 +178,8 @@ children=8
 
 /* uncomment and configure the following line if you want Kamailio to
  * bind on a specific interface/port/proto (default bind on all available) */
-# listen=udp:10.0.0.10:5060
+listen=udp:0.0.0.0:5060 advertise {{ kamailio_advertise_addr }}
+{# listen=tcp:0.0.0.0:5060 #}
 
 /* life time of TCP connection when there is no traffic
  * - a bit higher than registration expires to cope with UA behind NAT */
@@ -530,6 +532,9 @@ request_route {
 
 	# user location service
 	route(LOCATION);
+
+	# dispatch destinations
+	route(DISPATCH);
 }
 
 # Wrapper for relaying requests
@@ -978,4 +983,67 @@ failure_route[MANAGE_FAILURE] {
 		exit;
 	}
 #!endif
+}
+
+# Dispatch requests
+route[DISPATCH] {
+	if (!is_method("INVITE")) {
+		return;
+	}
+
+	# round robin dispatching on gateways group '1'
+	if(!ds_select_dst("1", "4"))
+	{
+		send_reply("404", "No destination");
+		exit;
+	}
+	xlog("L_DBG", "--- SCRIPT: going to <$ru> via <$du>\n");
+	t_on_failure("RTF_DISPATCH");
+
+	if (ds_is_from_list(1)) {
+		route(REQ_FROM_PRIVATE_NETWORK);
+	}
+	else {
+		route(REQ_FROM_PUBLIC_NETWORK);
+	}
+
+	route(RELAY);
+	exit;
+}
+
+route[REQ_FROM_PRIVATE_NETWORK] {
+#!ifdef WITHDISPATCHER
+	if (!ds_is_from_list(1)) {
+		return;
+	}
+#!endif
+
+	return;
+}
+
+route[REQ_FROM_PUBLIC_NETWORK] {
+#!ifdef WITH_DISPATCHER
+	$rU = $(rU{s.rm,+});
+	ds_select_dst(1, 0);
+#!endif
+
+	return;
+}
+
+# Sample failure route
+failure_route[RTF_DISPATCH] {
+	if (t_is_canceled()) {
+		exit;
+	}
+	# next DST - only for 500 or local timeout
+	if (t_check_status("500")
+			or (t_branch_timeout() and !t_branch_replied()))
+	{
+		if(ds_next_dst())
+		{
+			t_on_failure("RTF_DISPATCH");
+			route(RELAY);
+			exit;
+		}
+	}
 }

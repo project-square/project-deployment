@@ -13,7 +13,7 @@ ExecStart=/usr/local/sbin/kamailio -m $SHM_SIZE -M $PKG_SIZE \
     -P /run/kamailio/kamailio.pid
 ExecStopPost=/usr/bin/rm -f /run/kamailio/kamailio.pid
 PIDFile=/run/kamailio/kamailio.pid
-Restart=on-failure
+Restart=always
 RestartSec=30
 
 [Install]
