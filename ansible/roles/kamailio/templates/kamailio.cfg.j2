@@ -494,17 +494,17 @@ request_route {
 	route(WITHINDLG);
 
 	### only initial requests (no To tag)
-
+{# 
 	# authentication
 	route(AUTH);
-
+ #}
 	# record routing for dialog forming requests (in case they are routed)
 	# - remove preloaded route headers
 	remove_hf("Route");
 	if (is_method("INVITE|SUBSCRIBE")) {
 		record_route();
 	}
-
+{# 
 	# account only INVITEs
 	if (is_method("INVITE")) {
 		setflag(FLT_ACC); # do accounting
@@ -520,19 +520,19 @@ request_route {
 
 	# handle registrations
 	route(REGISTRAR);
-
+ #}
 	if ($rU==$null) {
 		# request with no Username in RURI
 		sl_send_reply("484","Address Incomplete");
 		exit;
 	}
-
+{# 
 	# dispatch destinations to PSTN
 	route(PSTN);
 
 	# user location service
 	route(LOCATION);
-
+ #}
 	# dispatch destinations
 	route(DISPATCH);
 }
