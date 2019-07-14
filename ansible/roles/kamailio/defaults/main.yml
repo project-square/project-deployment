@@ -11,5 +11,7 @@ kamailio_source_directory: "{{ kamailio_source_base_directory }}/kamailio-{{ kam
 
 kamailio_dispatcher_destination_port: 5060
 
+kamailio_advertise_addr: 34.90.205.233:5060
+
 # kamailio-5.2.3_src.tar.gz
 # https://www.kamailio.org/pub/kamailio/latest/src/kamailio-5.2.3_src.tar.gz
