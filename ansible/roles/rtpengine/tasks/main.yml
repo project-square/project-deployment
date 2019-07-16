@@ -1,0 +1,121 @@
+---
+- name: Create rtpengine group
+  group: 
+    name: "{{ rtpengine_group }}"
+    state: present
+
+- name: Create rtpengine user
+  user:
+    name: "{{ rtpengine_user }}"
+    group: "{{ rtpengine_group }}"
+    state: present
+
+- name: Installing required packages
+  apt:
+    update_cache: yes
+    pkg:
+      - dpkg-dev
+      - default-libmysqlclient-dev
+      - gperf
+      - iptables-dev
+      - debhelper
+      - libavcodec-dev
+      - libavfilter-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libbencode-perl
+      - libcrypt-openssl-rsa-perl
+      - libcrypt-rijndael-perl
+      - libcurl4-openssl-dev
+      - libdigest-crc-perl
+      - libdigest-hmac-perl
+      - libevent-dev
+      - libglib2.0-dev
+      - libhiredis-dev
+      - libio-multiplex-perl
+      - libio-socket-inet6-perl
+      - libjson-glib-dev
+      - libnet-interface-perl
+      - libpcap0.8-dev
+      - libpcre3-dev
+      - libsocket6-perl
+      - libspandsp-dev
+      - libssl-dev
+      - libswresample-dev
+      - libsystemd-dev
+      - libxmlrpc-core-c3-dev
+      - markdown
+
+- name: Check if libbcg729 is installed
+  command: dpkg-query -W libbcg729
+  register: libbcg729_check_deb
+  failed_when: libbcg729_check_deb.rc > 1
+  changed_when: libbcg729_check_deb.rc == 1
+
+- name: Download libbcg729
+  get_url:
+    url: "{{ rtpengine_libbcg729_url }}"
+    dest: "{{ rtpengine_source_base_directory }}"
+  when: libbcg729_check_deb.rc == 1
+
+- name: Install libbcg729
+  apt: 
+    deb: "{{ rtpengine_source_base_directory }}/{{ rtpengine_libbcg729_filename }}"
+  when: libbcg729_check_deb.rc == 1
+
+- name: Download libbcg729-dev
+  get_url:
+    url: "{{ rtpengine_libbcg729_dev_url }}"
+    dest: "{{ rtpengine_source_base_directory }}"
+  when: libbcg729_check_deb.rc == 1
+
+- name: Install libbcg729-dev
+  apt: 
+    deb: "{{ rtpengine_source_base_directory }}/{{ rtpengine_libbcg729_dev_filename }}"
+  when: libbcg729_check_deb.rc == 1
+
+- name: Removed downloaded rtpengine
+  file: 
+    path: "{{ rtpengine_source_directory }}"
+    state: absent
+
+- name: Unarchive
+  unarchive:
+    src: "{{ rtpengine_source_url }}"
+    dest: "{{ rtpengine_source_base_directory }}"
+    remote_src: yes
+
+- name: Build rtpengine deb
+  shell: dpkg-buildpackage
+  args:
+    chdir: "{{ rtpengine_source_directory }}"
+
+- name: Copy the startup script
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: files/systemd/rtpengine.service, dest: /etc/systemd/system/rtpengine.service }
+  tags: ["rtpengine_config"]
+
+- name: Install rtpengine
+  apt:
+    deb: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ rtpengine_pkg_daemon }}"
+    - "{{ rtpengine_pkg_recording }}"
+    - "{{ rtpengine_pkg_iptables }}"
+    - "{{ rtpengine_pkg_kernel }}"
+    - "{{ rtpengine_pkg_utils }}"
+  notify: restart rtpengine
+
+- name: Copy the config files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    backup: yes
+  with_items:
+    - { src: templates/rtpengine.conf.j2, dest: /etc/rtpengine/rtpengine.conf }
+  tags: ["rtpengine_config"]
+  notify: restart rtpengine

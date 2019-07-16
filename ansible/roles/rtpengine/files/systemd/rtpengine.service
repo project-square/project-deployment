@@ -1,0 +1,46 @@
+# more /etc/systemd/system/rtpengine.service 
+
+[Unit]
+Description=rtpengine
+After=syslog.target network.target local-fs.target
+
+[Service]
+; service
+Type=forking
+ExecStart=/usr/sbin/rtpengine \
+  --pidfile /var/run/rtpengine.pid 
+# --listen-ng=22222 \
+# --listen-udp=12222 \
+# --listen-cli=127.0.0.1:9900 \
+# --port-min 40000 \
+# --port-max 60000 \
+# --recording-dir /tmp \
+# --recording-method pcap \
+# --recording-format eth \
+# --delete-delay 1 \
+# --homer=10.132.0.14:9060 \
+# --homer-protocol=udp \
+# --homer-id=120 \
+# --log-level 6
+
+PIDFile=/var/run/rtpengine.pid
+TimeoutSec=15s
+Restart=always
+
+; exec
+User=rtpengine
+Group=rtpengine
+LimitCORE=infinity
+LimitNOFILE=100000
+LimitNPROC=60000
+;LimitSTACK=240
+LimitRTPRIO=infinity
+LimitRTTIME=7000000
+IOSchedulingClass=realtime
+IOSchedulingPriority=2
+CPUSchedulingPolicy=rr
+CPUSchedulingPriority=89
+UMask=0007
+
+[Install]
+WantedBy=multi-user.target
