@@ -1,0 +1,23 @@
+---
+
+rtpengine_version: mr7.4.1.1
+
+rtpengine_user: rtpengine
+rtpengine_group: rtpengine
+
+rtpengine_source_filename: "{{ rtpengine_version }}.tar.gz"
+rtpengine_source_url: "https://github.com/sipwise/rtpengine/archive/{{ rtpengine_source_filename }}"
+rtpengine_source_base_directory: /usr/local/src
+rtpengine_source_directory: "{{ rtpengine_source_base_directory }}/rtpengine-{{ rtpengine_version }}"
+
+rtpengine_libbcg729_filename: libbcg729-0_1.0.4+git20180222-0.1~bpo9+1_amd64.deb
+rtpengine_libbcg729_url: "https://deb.sipwise.com/spce/mr6.2.1/pool/main/b/bcg729/{{ rtpengine_libbcg729_filename }}"
+
+rtpengine_libbcg729_dev_filename: libbcg729-dev_1.0.4+git20180222-0.1~bpo9+1_amd64.deb
+rtpengine_libbcg729_dev_url: https://deb.sipwise.com/spce/mr6.2.1/pool/main/b/bcg729/{{ rtpengine_libbcg729_dev_filename }}
+
+rtpengine_pkg_daemon: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-daemon_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_amd64.deb"
+rtpengine_pkg_recording: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-recording-daemon_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_amd64.deb"
+rtpengine_pkg_iptables: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-iptables_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_amd64.deb"
+rtpengine_pkg_kernel: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-kernel-dkms_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_all.deb"
+rtpengine_pkg_utils: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-utils_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_all.deb"

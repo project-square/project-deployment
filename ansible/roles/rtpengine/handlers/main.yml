@@ -1,0 +1,5 @@
+---
+- name: restart rtpengine
+  systemd:
+    name: rtpengine
+    state: restarted

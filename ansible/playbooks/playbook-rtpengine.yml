@@ -1,0 +1,7 @@
+---
+- name: installing rtpengine
+  hosts: rtpengine
+  gather_facts: no
+  become: yes
+  roles:
+    - rtpengine
