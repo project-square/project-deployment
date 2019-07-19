@@ -13,3 +13,5 @@ asterisk_source_directory: "{{asterisk_download_dst}}/{{asterisk_target}}"
 asterisk_source_file: "{{asterisk_download_dst}}/{{asterisk_target}}.tar.gz"
 
 asterisk_nofile_limit: 1048576
+
+kamailio_dispatcher_destination_port: 5060
