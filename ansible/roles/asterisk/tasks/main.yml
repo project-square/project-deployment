@@ -59,6 +59,14 @@
   copy: src={{item}} dest=/etc/asterisk owner={{asterisk_user}} group={{asterisk_group}} mode=0644
   with_fileglob:
     - configuration/*
+  tags: asterisk_conf
+
+- name: Asterisk configuring
+  template: src={{item.src}} dest={{item.dest}} owner={{asterisk_user}} group={{asterisk_group}} mode=0644 backup=yes
+  with_items:
+    - {src: conf/pjsip.conf.j2, dest: /etc/asterisk/pjsip.conf}
+  notify: reload asterisk
+  tags: asterisk_conf
 
 - name: Set ownership
   file: path={{item}} owner={{asterisk_user}} group={{asterisk_group}} state=directory recurse=yes

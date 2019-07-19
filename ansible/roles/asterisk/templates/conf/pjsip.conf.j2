@@ -1,3 +1,43 @@
+[global]
+    type        = global
+    user_agent  = PSquare
+
+[transport-udp]
+    type        = transport
+    protocol    = udp
+    bind        = 0.0.0.0:5060
+    ;external_media_address=        ; External IP address to use in RTP handling (default: "")
+    ;external_signaling_address=    ; External address for SIP signalling (default: "")
+    ;external_signaling_port=0      ; External port for SIP signalling (default: "0")
+
+[sip-kamailio]
+    type        = endpoint
+    context     = sip-kamailio
+    dtmf_mode   = rfc4733
+    sdp_session = PSquare
+
+    disallow    = all
+    allow       = alaw
+    allow       = ulaw
+    allow       = opus
+
+;    outbound_proxy  = <outbound kamailio address
+
+; sip-kmailio config
+{% for host in groups["kamailio"] %}
+[sip-kamailio-{{ loop.index }}]
+    type        = identify
+    match       = {{ hostvars[host]["networkInterfaces"][0]["networkIP"] }}
+    endpoint    = sip-kamailio
+
+[sip-kamailio-{{ loop.index }}]
+    type        = aor
+    contact     = sip:{{ hostvars[host]["networkInterfaces"][0]["networkIP"] }}:{{ kamailio_dispatcher_destination_port }}
+
+{% endfor %}
+
+
+
 ; PJSIP Configuration Samples and Quick Reference
 ;
 ; This file has several very basic configuration examples, to serve as a quick
