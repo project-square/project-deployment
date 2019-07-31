@@ -49,7 +49,8 @@
     name: pexpect
 
 - name: Remove old file
-  file: path={{ kamailio_source_base_directory }}/{{ kamailio_source_filename }}
+  file: 
+    path: "{{ kamailio_source_base_directory }}/{{ kamailio_source_filename }}"
     state: absent
 
 - name: Remove old directories
