@@ -303,6 +303,7 @@ loadmodule "debugger.so"
 loadmodule "topoh.so"
 loadmodule "dialog.so"
 loadmodule "rtpengine.so"
+loadmodule "sdpops.so"
 
 # ----------------- setting module-specific parameters ---------------
 
@@ -470,6 +471,11 @@ modparam("tm", "auto_inv_100", 1)
 # ----- topoh params
 modparam("topoh", "mask_ip", "{{ kamailio_advertise_addr }}")
 
+# ----- rtpengine params
+modparam("rtpengine", "rtpengine_sock", "{{ rtpengine_lb_addr }}")
+modparam("rtpengine", "read_sdp_pv", "$avp(org_sdp)")
+modparam("rtpengine", "write_sdp_pv", "$avp(fix_sdp)")
+
 ####### Routing Logic ########
 
 
@@ -513,9 +519,13 @@ request_route {
 		sl_send_reply("484","Address Incomplete");
 		exit;
 	}
+	
+	route(RTP_BRIDGE);
 
 	# dispatch destinations
 	route(DISPATCH);
+
+	route(RELAY);
 }
 
 # Wrapper for relaying requests
@@ -582,7 +592,9 @@ route[REQINIT] {
 
 # Handle requests within SIP dialogs
 route[WITHINDLG] {
-	if (!has_totag()) return;
+	if (!has_totag()) {
+		return;
+	}
 	xdbg("Execute WITHINDLG. [$T_branch_idx] to $ru\n");
 
 	if (ds_is_from_list(1)) {
@@ -700,8 +712,7 @@ route[DISPATCH] {
 	xlog("L_DBG", "--- SCRIPT: going to <$ru> via <$du>\n");
 	t_on_failure("RTF_DISPATCH");
 
-	route(RELAY);
-	exit;
+	return;
 }
 
 route[REQ_FROM_PRIVATE_NETWORK] {
@@ -774,4 +785,61 @@ route[NATMANAGE] {
 	}
 #!endif
 	return;
+}
+
+route[RTP_BRIDGE] {
+	if (is_method("BYE|CANCEL")) {
+		route(RTP_BRIDGE_DELETE);
+		return;
+	}
+	else if (!is_method("INVITE")) {
+		return;
+	}
+	xlog("L_DBG", "RTP_BRIDGE. $ci\n");
+
+	if (ds_is_from_list(1)) {
+		route(RTP_BRIDGE_OUTBOUND);
+	} else {
+		route(RTP_BRIDGE_INBOUND);
+	}
+
+	t_on_reply("MANAGE_RTP_REPLY");
+}
+
+route[RTP_BRIDGE_DELETE] {
+	xlog("L_DBG", "Deleting RTP BRIDGE. $ci\n");
+	rtpengine_manage();
+}
+
+route[RTP_BRIDGE_OUTBOUND] {
+	if (!sdp_content()) {
+		return;
+	}
+	xlog("L_INFO", "route. RTP_BRIDGE_OUTBOUND. $ci");
+
+	$avp(org_sdp) = $rb;
+	rtpengine_manage("replace-origin replace-session-connection direction=priv direction=pub ICE=remove");
+	set_body("$avp(fix_sdp)", "application/sdp");
+}
+
+route[RTP_BRIDGE_INBOUND] {
+	if (!sdp_content()) {
+		return;
+	}
+	xlog("L_INFO", "route. RTP_BRIDGE_INBOUND. $ci");
+
+	$avp(org_sdp) = $rb;
+	rtpengine_manage("replace-origin replace-session-connection direction=pub direction=priv ICE=remove");
+	set_body("$avp(fix_sdp)", "application/sdp");
+}
+
+onreply_route[MANAGE_RTP_REPLY] {
+	if (!sdp_content()) {
+		return;
+	}
+	xlog("L_INFO", "onreply_route. MANAGE_RTP_REPLY. $ci");
+
+	$avp(org_sdp) = $rb;
+	rtpengine_manage("replace-origin replace-session-connection ICE=remove");
+	set_body("$avp(fix_sdp)", "application/sdp");
 }
