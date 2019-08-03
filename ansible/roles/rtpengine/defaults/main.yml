@@ -21,3 +21,5 @@ rtpengine_pkg_recording: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-r
 rtpengine_pkg_iptables: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-iptables_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_amd64.deb"
 rtpengine_pkg_kernel: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-kernel-dkms_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_all.deb"
 rtpengine_pkg_utils: "{{ rtpengine_source_base_directory }}/ngcp-rtpengine-utils_{{ rtpengine_version[2:] }}+0~{{ rtpengine_version }}_all.deb"
+
+rtpengine_lb_address: "10.164.15.193"
