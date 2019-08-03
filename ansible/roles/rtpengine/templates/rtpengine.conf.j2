@@ -13,8 +13,8 @@ table = 0
 # interface = 12.23.34.45!23.34.45.56
 interface = pub/{{ hostvars[inventory_hostname]["networkInterfaces"][0]["networkIP"] }}!{{ hostvars[inventory_hostname]["networkInterfaces"][0]["accessConfigs"][0]["natIP"] }};priv/{{ hostvars[inventory_hostname]["networkInterfaces"][0]["networkIP"] }}
 
-listen-ng = 127.0.0.1:2223
-# listen-tcp = 25060
+listen-ng = {{ rtpengine_lb_address }}:2223
+listen-tcp = {{ hostvars[inventory_hostname]["networkInterfaces"][0]["networkIP"] }}:25060 # loadbalancer health check
 # listen-udp = 12222
 
 timeout = 60

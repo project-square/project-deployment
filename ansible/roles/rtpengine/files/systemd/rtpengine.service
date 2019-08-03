@@ -8,7 +8,7 @@ After=syslog.target network.target local-fs.target
 ; service
 Type=forking
 ExecStart=/usr/sbin/rtpengine \
-  --pidfile /var/run/rtpengine.pid 
+  --pidfile /var/run/rtpengine/rtpengine.pid
 # --listen-ng=22222 \
 # --listen-udp=12222 \
 # --listen-cli=127.0.0.1:9900 \
@@ -23,7 +23,7 @@ ExecStart=/usr/sbin/rtpengine \
 # --homer-id=120 \
 # --log-level 6
 
-PIDFile=/var/run/rtpengine.pid
+PIDFile=/var/run/rtpengine/rtpengine.pid
 TimeoutSec=15s
 Restart=always
 

@@ -96,6 +96,7 @@
     dest: "{{ item.dest }}"
   with_items:
     - { src: files/systemd/rtpengine.service, dest: /etc/systemd/system/rtpengine.service }
+    - { src: files/tmpfiles/rtpengine.conf, dest: /etc/tmpfiles.d/rtpengine.conf }
   tags: ["rtpengine_config"]
 
 - name: Install rtpengine

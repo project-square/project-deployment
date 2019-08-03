@@ -182,8 +182,6 @@ children=8
 listen=udp:{{ kamailio_advertise_addr }} advertise {{ kamailio_advertise_addr }}
 listen=udp:{{ hostvars[inventory_hostname]["networkInterfaces"][0]["networkIP"] }}:5060
 
-{# listen=udp:34.90.205.233:5060 advertise 34.90.205.233:5060 #}
-
 /* life time of TCP connection when there is no traffic
  * - a bit higher than registration expires to cope with UA behind NAT */
 tcp_connection_lifetime=3605
@@ -304,6 +302,7 @@ loadmodule "debugger.so"
 
 loadmodule "topoh.so"
 loadmodule "dialog.so"
+loadmodule "rtpengine.so"
 
 # ----------------- setting module-specific parameters ---------------
 
