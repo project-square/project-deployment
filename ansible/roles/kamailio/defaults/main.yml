@@ -11,7 +11,7 @@ kamailio_source_directory: "{{ kamailio_source_base_directory }}/kamailio-{{ kam
 
 kamailio_dispatcher_destination_port: 5060
 
-kamailio_advertise_addr: 34.90.205.233:5060
+kamailio_advertise_addr: 34.90.131.69:5060
 
 rtpengine_lb_addr: udp:10.164.15.193:2223
 

@@ -1,7 +1,7 @@
 ---
 plugin: gcp_compute
 projects:
-  - k8s-test-01-239423  
+  - project-square
 keyd_groups:
   - zone
 filters: []
@@ -9,7 +9,7 @@ filters: []
 auth_kind: serviceaccount
 scopes:
  - 'https://www.googleapis.com/auth/cloud-platform'
-service_account_file: /home/pchero/k8s-test-01-eadb65cfe297.json
+service_account_file: /home/pchero/project-square-9f7617ff7fab.json
 hostnames:
   - name
 compose:
