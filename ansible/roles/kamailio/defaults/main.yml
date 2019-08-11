@@ -13,7 +13,7 @@ kamailio_dispatcher_destination_port: 5060
 
 kamailio_advertise_addr: 34.90.131.69:5060
 
-rtpengine_lb_addr: udp:10.164.15.193:2223
+rtpengine_lb_addr: udp:10.164.0.8:2223
 
 # kamailio-5.2.3_src.tar.gz
 # https://www.kamailio.org/pub/kamailio/latest/src/kamailio-5.2.3_src.tar.gz
